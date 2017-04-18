@@ -64,12 +64,13 @@ public class AnnotationJob extends AbstractJob{
 		String inPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
 		
 		String outPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath();		
-		String cmd = "prokka --addgenes --force --mincontiglen 200 --cpus " + getCpuReq() + " \\\n "
+		String cmd = "prokka --force --mincontiglen 200 --cpus " + getCpuReq() + " \\\n "
 				+ "  --genus  " + sample.getGenus().getName() + " \\\n "
 				+ "  --species  " + sample.getSpecies().getSpeciesName() + " \\\n "				
 				+ "  --outdir " + outPath +  " \\\n " 
 				+ "  --prefix " + sample.getSampleID() +  " \\\n "
 				+ "  --locus " + sample.getSampleID() +  " \\\n "
+                + "  --proteins dbs/card/CARD \\\n "
 				+ ((sample.getGenus().getGram() == Gram.NEGATIVE)?"  --gram neg \\\n":"")
 				+ ((sample.getGenus().getGram() == Gram.POSITIVE)?"  --gram pos \\\n":"")
 				+ "  " + inPath + "/" + sample.getSampleID() + ".fasta && \\\n"

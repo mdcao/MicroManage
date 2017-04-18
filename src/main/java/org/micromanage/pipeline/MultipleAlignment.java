@@ -1,0 +1,65 @@
+/*****************************************************************************
+ * Copyright (c) 2006-2017 Minh Duc Cao (minhduc.cao@gmail.com).
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the names of the institutions nor the names of the contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+/*                           Revision History
+ * 17-04-2017 - Minh Duc Cao: Created
+ *
+ ****************************************************************************/
+
+package org.micromanage.pipeline;
+
+import org.micromanage.pipeline.sample.BacterialSample;
+
+import java.io.File;
+import java.util.ArrayList;
+
+/**
+ * Created by minhduc on 17/04/17.
+ */
+public class MultipleAlignment {
+    public static void mm(String species){
+        MicroManageConfig mmConfig =  MicroManageConfig.getConfig();
+
+        //get relevant samples
+        ArrayList<BacterialSample> mySamples = new ArrayList<BacterialSample>();
+        for (BacterialSample sample:mmConfig.getSamples()){
+            if (sample.getSpecies().getName().equals(species))
+                mySamples.add(sample);
+        }
+        //go through the
+
+        for (BacterialSample sample:mySamples){
+            String outPath = mmConfig.baseDir + File.separator + mmConfig.annotationDir + File.separator + sample.samplePath();
+            String gff = outPath + File.separator + sample.getSampleID() + ".gff";
+
+
+
+        }
+    }
+}

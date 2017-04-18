@@ -74,9 +74,6 @@ public class Assembly extends AbstractJob{
 		return cmd;
 	}
 
-	
-
-
 	@Override
 	public String jobName() {		 
 		return "sp" + sample.getSampleID();

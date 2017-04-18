@@ -78,6 +78,8 @@ public class TrimIlluminaReads extends AbstractJob{
 				+ "  " + datPath + "_R1.fastq.gz " + datPath + "_R2.fastq.gz \\\n"
 				+ "  " + outPath + "_P1.fastq.gz " + outPath + "_U1.fastq.gz " + outPath + "_P2.fastq.gz " + outPath + "_U2.fastq.gz \\\n"
 				+ "  ILLUMINACLIP:" + config.pathTrimmomatic + "/adapters/adapters.fa:3:30:10 SLIDINGWINDOW:4:15 LEADING:10 TRAILING:10 MINLEN:36 &&  \\\n"
+				+ "rm -f " + outPath + "_U1.fastq.gz " + outPath + "_U2.fastq.gz "
+				+ config.baseDir + "/" + config.logDir + "/" + sample.samplePath() + "_trim.log &&  \\\n"
 				+ "touch  " + fileSuccess + "\n"
 				+ "echo $? AT `date`";
 		return cmd;

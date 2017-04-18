@@ -1,4 +1,4 @@
-/*****************************************************************************
+/*
  * Copyright (c) 2017 Minh Duc Cao (minhduc.cao@gmail.com).
  * All rights reserved.
  *
@@ -181,11 +181,7 @@ public class MicroManageConfig {
 			speciesDb.put(st, new Species(st,st.replaceAll("_", " ")));
 		}		 
 		//Read the list of samples
-
 	}
-
-
-
 
 	public synchronized boolean addSample(BacterialSample sample){
 		return samples.add(sample);
