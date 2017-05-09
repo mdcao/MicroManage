@@ -39,10 +39,7 @@ import java.util.ArrayList;
 import javax.json.JsonObject;
 
 import org.micromanage.pipeline.MicroManageConfig;
-import org.micromanage.pipeline.job.AbstractJob;
-import org.micromanage.pipeline.job.AnnotationJob;
-import org.micromanage.pipeline.job.Assembly;
-import org.micromanage.pipeline.job.TrimIlluminaReads;
+import org.micromanage.pipeline.job.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,9 +84,10 @@ public class BacterialSample {
             //add jobs
             jobs = new ArrayList<AbstractJob>();
 
-            jobs.add(new TrimIlluminaReads(this));
-            jobs.add(new Assembly(this));
+            jobs.add(new TrimIlluminaJob(this));
+            jobs.add(new AssemblyJob(this));
             jobs.add(new AnnotationJob(this));
+            jobs.add(new Alignment2AssemblyJob(this));
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

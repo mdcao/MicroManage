@@ -38,12 +38,12 @@ import java.io.File;
 import org.micromanage.pipeline.MicroManageConfig;
 import org.micromanage.pipeline.sample.BacterialSample;
 
-public class TrimIlluminaReads extends AbstractJob{
+public class TrimIlluminaJob extends AbstractJob{
 
 	/**
 	 * @param sample
 	 */
-	public TrimIlluminaReads(BacterialSample sample) {
+	public TrimIlluminaJob(BacterialSample sample) {
 		super(sample);
 		this.setCpuReq(8);
 		this.setMemReq(8);

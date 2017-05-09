@@ -88,6 +88,7 @@ public class MicroManageConfig {
 	public String rawDir = "Raw";
 	public String trimmedDir = "Trimmed";
 	public String assemblyDir = "Assemblies";
+    public String variationDir = "Variations";
 	public String annotationDir = "Annotation";
 	
 

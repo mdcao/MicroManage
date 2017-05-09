@@ -33,25 +33,26 @@
  ****************************************************************************/
 package org.micromanage.pipeline.job;
 
-import java.io.File;
-
 import org.micromanage.pipeline.MicroManageConfig;
+import org.micromanage.pipeline.job.AbstractJob;
 import org.micromanage.pipeline.sample.BacterialSample;
 
+import java.io.File;
 
-public class Assembly extends AbstractJob{
+
+public class Alignment2AssemblyJob extends AbstractJob{
 	/**
 	 * @param sample
 	 */
-	public Assembly(BacterialSample sample) {
+	public Alignment2AssemblyJob(BacterialSample sample) {
 		super(sample);
-		this.setCpuReq(16);
-		this.setMemReq(62);	
+		this.setCpuReq(4);
+		this.setMemReq(8);
 
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String outPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
-		//listOutFiles.add(outPath + "/" + sample.getSampleID() + ".fasta");
-		fileSuccess = outPath + "/" + this.jobName() + ".success";		
+        String outPath = config.baseDir + "/" + config.variationDir + "/" + sample.samplePath();
+
+        fileSuccess = outPath + "/" + this.jobName() + ".success";
 		File file = new File(outPath);
 		if (!file.exists()){
 			file.mkdirs();
@@ -61,22 +62,39 @@ public class Assembly extends AbstractJob{
 	@Override
 	public String command() {
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String inPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();		
-		String outPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
+		String outPath = config.baseDir + "/" + config.variationDir + "/" + sample.samplePath();
 
-		String cmd = "echo START AT `date`\n"
-				+ config.exeSpades + " -m " + (getMemReq() - 2) + " -t " + getCpuReq() + " -k 21,33,55,77,99,127 --careful \\\n"
-				+ " --pe1-1 " + inPath + "_P1.fastq.gz --pe1-2 " + inPath + "_P2.fastq.gz \\\n"						 
-				+ " -o " + outPath + "/spades  && \\\n"
-				+ "jsa.amra.assppro --sample " + sample.getSampleID() + " --input " + outPath + "/spades/contigs" +
-				".fasta --output " + outPath + "/" + sample.getSampleID() + ".fasta --summary " + fileSuccess + "\n"
-				+ "echo $? AT `date`";
-		return cmd;
+        String annoPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath();
+        String trimPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();
+
+        String cmd = "echo START AT `date`\n"
+                ///////////////////////////////////////////////////////////////////
+                + config.exeBwa + " mem -t " + getCpuReq()
+                + " -R \"@RG\\\\tID:" + sample.getSampleID() + "\\\\tSM:" + sample.getSampleID() + "\" "
+                + annoPath + "/bwaIndex/"+sample.getSampleID() + " "
+                + trimPath + "_P1.fastq.gz " + trimPath + "_P2.fastq.gz > "
+                + outPath  + "/assembly_" + sample.getSampleID() + ".sam && \\\n"
+                ///////////////////////////////////////////////////////////////////
+                + config.exeSamtools + " view -buS " + outPath  + "/assembly_" + sample.getSampleID() + ".sam | "
+                + config.exeSamtools + " sort -o " + outPath  + "/assembly_" + sample.getSampleID() + ".bam - && \\\n"
+                ///////////////////////////////////////////////////////////////////
+                + config.exeSamtools + " index " + outPath  + "/assembly_" + sample.getSampleID() + ".bam && \\\n"
+                + "rm -f " + outPath  + "/assembly_" + sample.getSampleID() + ".sam && \\\n"
+                ///////////////////////////////////////////////////////////////////
+                + config.exeFreeBayes + " -f " + annoPath + "/" + sample.getSampleID() + ".fna -F 0.1 -C 2 "
+                + outPath  + "/assembly_" + sample.getSampleID() + ".bam -v "
+                + outPath  + "/assembly_" + sample.getSampleID() + ".vcf && \\\n"
+                ///////////////////////////////////////////////////////////////////
+                + "touch  " + fileSuccess + "\n"
+                + "echo $? AT `date`";
+        return cmd;
 	}
+	//freebayes -f ref.fa -F 0.01 -C 1 --pooled-continuous aln.bam >var.vcf
+
 
 	@Override
 	public String jobName() {		 
-		return "sp" + sample.getSampleID();
+		return "av" + sample.getSampleID();
 	}
 
 }
