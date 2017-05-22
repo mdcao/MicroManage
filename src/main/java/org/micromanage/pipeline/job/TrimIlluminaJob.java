@@ -48,41 +48,35 @@ public class TrimIlluminaJob extends AbstractJob{
 		this.setCpuReq(8);
 		this.setMemReq(8);
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String datPath = config.baseDir + "/" + config.rawDir + "/" + sample.samplePath();
-		String outPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();
 
-		//listOutFiles.add(outPath + "_P1.fastq.gz");
-		//listOutFiles.add(outPath + "_P2.fastq.gz");
-		fileSuccess = outPath + ".success";
-
-
-		File file = new File(fileSuccess);
-		file = new File (file.getParent());
-		if (!file.exists()){
-			file.mkdirs();
-
-		}
+        outFolderPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath() + "/";
+        File folderFile = new File(outFolderPath);
+        if (!folderFile.exists()){
+            folderFile.mkdirs();
+        }
+        fileSuccess = outFolderPath + sample.getSampleID() + ".success";
 	}
 
 	@Override
 	public String command() {
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String datPath = config.baseDir + "/" + config.rawDir + "/" + sample.samplePath();
-		String outPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();
 
-		String cmd = "echo START AT `date`\n" 
-				+ config.exeJava + " -jar " + config.pathTrimmomatic + "/trimmomatic.jar PE \\\n"
-				+ "  -threads " + this.getCpuReq() + " \\\n"
-				+ "  -phred33 \\\n"
-				+ "  -trimlog " + config.baseDir + "/" + config.logDir + "/" + sample.samplePath() + "_trim.log \\\n"
-				+ "  " + datPath + "_R1.fastq.gz " + datPath + "_R2.fastq.gz \\\n"
-				+ "  " + outPath + "_P1.fastq.gz " + outPath + "_U1.fastq.gz " + outPath + "_P2.fastq.gz " + outPath + "_U2.fastq.gz \\\n"
-				+ "  ILLUMINACLIP:" + config.pathTrimmomatic + "/adapters/adapters.fa:3:30:10 SLIDINGWINDOW:4:15 LEADING:10 TRAILING:10 MINLEN:36 &&  \\\n"
-				+ "rm -f " + outPath + "_U1.fastq.gz " + outPath + "_U2.fastq.gz "
-				+ config.baseDir + "/" + config.logDir + "/" + sample.samplePath() + "_trim.log &&  \\\n"
-				+ "touch  " + fileSuccess + "\n"
-				+ "echo $? AT `date`";
-		return cmd;
+        String datPath = config.baseDir + "/" + config.rawDir + "/" + sample.samplePath() + "/" + sample.getSampleID();
+        String outPath = outFolderPath + sample.getSampleID();
+
+        String cmd = "echo START AT `date`\n"
+                + config.exeJava + " -jar " + config.pathTrimmomatic + "/trimmomatic.jar PE \\\n"
+                + "  -threads " + this.getCpuReq() + " \\\n"
+                + "  -phred33 \\\n"
+                + "  -trimlog " + outPath+ "_trim.log \\\n"
+                + "  " + datPath + "_R1.fastq.gz " + datPath + "_R2.fastq.gz \\\n"
+                + "  " + outPath + "_P1.fastq.gz " + outPath + "_U1.fastq.gz "
+                +        outPath + "_P2.fastq.gz " + outPath + "_U2.fastq.gz \\\n"
+                + "  ILLUMINACLIP:" + config.pathTrimmomatic + "/adapters/adapters.fa:3:30:10 SLIDINGWINDOW:4:15 LEADING:10 TRAILING:10 MINLEN:36 &&  \\\n"
+                + "rm -f " + outPath + "_U1.fastq.gz " + outPath + "_U2.fastq.gz " + outPath+ "_trim.log &&  \\\n"
+                + "touch  " + fileSuccess + "\n"
+                + "echo $? AT `date`";
+        return cmd;
 	}
 
 	@Override

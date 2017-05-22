@@ -68,6 +68,7 @@ public abstract class AbstractJob {
 	}
 	
 	String fileSuccess = "";
+    String outFolderPath = "";
 	ArrayList<String> listInFiles = new ArrayList<String>();
 		
 	

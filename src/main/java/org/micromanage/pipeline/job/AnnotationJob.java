@@ -51,32 +51,38 @@ public class AnnotationJob extends AbstractJob{
 		this.setMemReq(32);	
 		
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String outPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath();
-		fileSuccess = outPath + "/" + this.jobName() + ".success";
-		
-		new File(outPath).mkdirs();		
+        outFolderPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath() + "/";
+        File folderFile = new File(outFolderPath);
+        if (!folderFile.exists()){
+            folderFile.mkdirs();
+        }
+        fileSuccess = outFolderPath + sample.getSampleID() + ".success";
 	}
 		
 
 	@Override
 	public String command() {
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String inPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
-		
-		String outPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath();		
-		String cmd = "prokka --force --mincontiglen 200 --cpus " + getCpuReq() + " \\\n "
-				+ "  --genus  " + sample.getGenus().getName() + " \\\n "
-				+ "  --species  " + sample.getSpecies().getSpeciesName() + " \\\n "				
-				+ "  --outdir " + outPath +  " \\\n " 
-				+ "  --prefix " + sample.getSampleID() +  " \\\n "
-				+ "  --locus " + sample.getSampleID() +  " \\\n "
+
+        String inPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
+
+        String outPath = outFolderPath;
+        String cmd = config.exeProkka +
+                " --force --mincontiglen 200 --cpus " + getCpuReq() + " \\\n "
+                + "  --genus  " + sample.getGenus().getName() + " \\\n "
+                + "  --species  " + sample.getSpecies().getSpeciesName() + " \\\n "
+                + "  --outdir " + outPath +  " \\\n "
+                + "  --prefix " + sample.getSampleID() +  " \\\n "
+                + "  --locus " + sample.getSampleID() +  " \\\n "
                 + "  --proteins dbs/card/CARD \\\n "
-				+ ((sample.getGenus().getGram() == Gram.NEGATIVE)?"  --gram neg \\\n":"")
-				+ ((sample.getGenus().getGram() == Gram.POSITIVE)?"  --gram pos \\\n":"")
-				+ "  " + inPath + "/" + sample.getSampleID() + ".fasta && \\\n"
-				+ "touch " + fileSuccess + "\n"
-				+ "echo $? AT `date`\n";
-		return cmd;
+                + ((sample.getGenus().getGram() == Gram.NEGATIVE)?"  --gram neg \\\n":"")
+                + ((sample.getGenus().getGram() == Gram.POSITIVE)?"  --gram pos \\\n":"")
+                + "  " + inPath + "/" + sample.getSampleID() + ".fasta && \\\n"
+                + config.exeBwa + " index -p " + outPath +  "bwaIndex/" + sample.getSampleID()
+                + " " + outPath + sample.getSampleID() + ".fna && \\\n"
+                + "touch " + fileSuccess + "\n"
+                + "echo $? AT `date`\n";
+        return cmd;
 	}
 
 	@Override

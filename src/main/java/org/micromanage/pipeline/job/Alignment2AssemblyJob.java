@@ -50,40 +50,38 @@ public class Alignment2AssemblyJob extends AbstractJob{
 		this.setMemReq(8);
 
 		MicroManageConfig config = MicroManageConfig.getConfig();
-        String outPath = config.baseDir + "/" + config.variationDir + "/" + sample.samplePath();
-
-        fileSuccess = outPath + "/" + this.jobName() + ".success";
-		File file = new File(outPath);
-		if (!file.exists()){
-			file.mkdirs();
-		}
+        outFolderPath = config.baseDir + "/" + config.variationDir + "/" + sample.samplePath() + "/";
+        File folderFile = new File(outFolderPath);
+        if (!folderFile.exists()){
+            folderFile.mkdirs();
+        }
+        fileSuccess = outFolderPath + sample.getSampleID() + ".success";
 	}
 
 	@Override
 	public String command() {
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String outPath = config.baseDir + "/" + config.variationDir + "/" + sample.samplePath();
-
-        String annoPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath();
-        String trimPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();
+        String outPath = outFolderPath;
+        String annoPath = config.baseDir + "/" + config.annotationDir + "/" + sample.samplePath() + "/";
+        String trimPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath() + "/" + sample.getSampleID();
 
         String cmd = "echo START AT `date`\n"
                 ///////////////////////////////////////////////////////////////////
                 + config.exeBwa + " mem -t " + getCpuReq()
                 + " -R \"@RG\\\\tID:" + sample.getSampleID() + "\\\\tSM:" + sample.getSampleID() + "\" "
-                + annoPath + "/bwaIndex/"+sample.getSampleID() + " "
+                + annoPath + "bwaIndex/"+sample.getSampleID() + " "
                 + trimPath + "_P1.fastq.gz " + trimPath + "_P2.fastq.gz > "
-                + outPath  + "/assembly_" + sample.getSampleID() + ".sam && \\\n"
+                + outPath  + "assembly_" + sample.getSampleID() + ".sam && \\\n"
                 ///////////////////////////////////////////////////////////////////
-                + config.exeSamtools + " view -buS " + outPath  + "/assembly_" + sample.getSampleID() + ".sam | "
-                + config.exeSamtools + " sort -o " + outPath  + "/assembly_" + sample.getSampleID() + ".bam - && \\\n"
+                + config.exeSamtools + " view -buS " + outPath  + "assembly_" + sample.getSampleID() + ".sam | "
+                + config.exeSamtools + " sort -o " + outPath  + "assembly_" + sample.getSampleID() + ".bam - && \\\n"
                 ///////////////////////////////////////////////////////////////////
-                + config.exeSamtools + " index " + outPath  + "/assembly_" + sample.getSampleID() + ".bam && \\\n"
-                + "rm -f " + outPath  + "/assembly_" + sample.getSampleID() + ".sam && \\\n"
+                + config.exeSamtools + " index " + outPath  + "assembly_" + sample.getSampleID() + ".bam && \\\n"
+                + "rm -f " + outPath  + "assembly_" + sample.getSampleID() + ".sam && \\\n"
                 ///////////////////////////////////////////////////////////////////
-                + config.exeFreeBayes + " -f " + annoPath + "/" + sample.getSampleID() + ".fna -F 0.1 -C 2 "
-                + outPath  + "/assembly_" + sample.getSampleID() + ".bam -v "
-                + outPath  + "/assembly_" + sample.getSampleID() + ".vcf && \\\n"
+                + config.exeFreeBayes + " -f " + annoPath + sample.getSampleID() + ".fna -F 0.1 -C 2 "
+                + outPath  + "assembly_" + sample.getSampleID() + ".bam -v "
+                + outPath  + "assembly_" + sample.getSampleID() + ".vcf && \\\n"
                 ///////////////////////////////////////////////////////////////////
                 + "touch  " + fileSuccess + "\n"
                 + "echo $? AT `date`";

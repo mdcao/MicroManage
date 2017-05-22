@@ -49,32 +49,31 @@ public class AssemblyJob extends AbstractJob{
 		this.setMemReq(62);	
 
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String outPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
-		//listOutFiles.add(outPath + "/" + sample.getSampleID() + ".fasta");
-		fileSuccess = outPath + "/" + this.jobName() + ".success";		
-		File file = new File(outPath);
-		if (!file.exists()){
-			file.mkdirs();
-		}
+        outFolderPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath() + "/";
+        File folderFile = new File(outFolderPath);
+        if (!folderFile.exists()){
+            folderFile.mkdirs();
+        }
+        fileSuccess = outFolderPath + sample.getSampleID() + ".success";
 	}
 
 	@Override
 	public String command() {
 		MicroManageConfig config = MicroManageConfig.getConfig();
-		String inPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath();		
-		String outPath = config.baseDir + "/" + config.assemblyDir + "/" + sample.samplePath();
+        String inPath = config.baseDir + "/" + config.trimmedDir + "/" + sample.samplePath() + "/" + sample.getSampleID();
+        String outPath = outFolderPath;
 
-		String cmd = "echo START AT `date`\n"
-				+ config.exeSpades + " -m " + (getMemReq() - 2) + " -t " + getCpuReq() + " -k 77,99,127 --careful \\\n"
-				+ " --pe1-1 " + inPath + "_P1.fastq.gz --pe1-2 " + inPath + "_P2.fastq.gz \\\n"						 
-				+ " -o " + outPath + "/spades  && \\\n"
-				+ "rm -rf " + outPath + "/spades/tmp  && \\\n"
-				+ "rm -rf " + outPath + "/spades/corrected  && \\\n"
-				+ "jsa.amra.assppro --sample " + sample.getSampleID()
-				+ " --input " + outPath + "/spades/contigs.fasta --output "
-				+ outPath + "/" + sample.getSampleID() + ".fasta --summary " + fileSuccess + "\n"
-				+ "echo $? AT `date`";
-		return cmd;
+        String cmd = "echo START AT `date`\n"
+                + config.exeSpades + " -m " + (getMemReq() - 2) + " -t " + getCpuReq() + " -k 77,99,127 --careful \\\n"
+                + " --pe1-1 " + inPath + "_P1.fastq.gz --pe1-2 " + inPath + "_P2.fastq.gz \\\n"
+                + " -o " + outPath + "spades  && \\\n"
+                + "rm -rf " + outPath + "spades/tmp  && \\\n"
+                + "rm -rf " + outPath + "spades/corrected  && \\\n"
+                + "jsa.amra.assppro --sample " + sample.getSampleID()
+                + " --input " + outPath + "spades/contigs.fasta --output "
+                + outPath + sample.getSampleID() + ".fasta --summary " + fileSuccess + "\n"
+                + "echo $? AT `date`";
+        return cmd;
 	}
 
 	@Override
